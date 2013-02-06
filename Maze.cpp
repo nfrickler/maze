@@ -17,11 +17,49 @@ Maze::Maze (MyControl* i_Contr)
     m_is_paintable = true;
 }
 
+/* delete old Maze
+ */
+void Maze::deleteOld () {
+
+    // remove all elements
+    t_element* current = m_list;
+    t_element* cache = NULL;
+    while (current != NULL) {
+	cache = current;
+	current = current->next;
+	free(cache);
+    }
+
+    // remove all blocks
+    int num = m_blocks.size();
+    for (int i = 0; i < num; i++) {
+	free(m_blocks[i]);
+    }
+    m_blocks.clear();
+
+    // empty lines
+    num = m_lines.size();
+    for (int i = 0; i < num; i++) {
+	if (m_lines[i][0] != NULL) {
+	    free(m_lines[i][0]);
+	}
+	if (m_lines[i][1] != NULL) {
+	    free(m_lines[i][1]);
+	}
+	m_lines[i].clear();
+    }
+    m_lines.clear();
+
+}
+
 /* create empty Maze
  * @param int: width of new Maze
  * @param int: height of new Maze
  */
 void Maze::create (int i_rows, int i_columns) {
+
+    // delete old data
+    deleteOld();
 
     // init
     m_rows = i_rows;
@@ -31,9 +69,10 @@ void Maze::create (int i_rows, int i_columns) {
     for (int i = 0; i < (m_rows * m_columns); i++) {
 	int row = (int) i / m_columns;
 	int column = (int) i % m_columns;
-	cout << "New Block (" << row << ", " << column << ")\n";
 	m_blocks[i] = new Block(i, row, column, 0);
     }
+
+    queue_draw();
 }
 
 /* draw

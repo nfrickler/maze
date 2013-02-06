@@ -21,6 +21,9 @@ class AppWin : public Gtk::Window {
 	Gtk::HBox* m_hbox;
 	Gtk::VBox* m_vbox;
 
+	Glib::RefPtr<Gtk::UIManager> m_refUIManager;
+	Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+
 	void drawMenu();
 };
 

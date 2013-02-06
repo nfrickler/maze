@@ -17,6 +17,12 @@ class MyControl {
 	void runMaze();
 	void stopMaze();
 
+	//Signal handlers:
+	void on_menu_new();
+	void on_menu_quit();
+	void on_menu_file_save();
+	void on_menu_file_load();
+
     protected:
 	Maze* m_Maze;
 	AppWin* m_AppWin;

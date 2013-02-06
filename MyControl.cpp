@@ -18,8 +18,8 @@ MyControl::MyControl () {
     // create new AppWin object
     m_AppWin = new AppWin(this);
 
-    // ask user for new Maze
-    m_AppWin->askForMaze();
+    // show Painter
+    showPainter();
 }
 
 /* getter */
@@ -80,4 +80,23 @@ void MyControl::stopMaze() {
 
     // back to painter
     showPainter();
+}
+
+/* handle
+ */
+void MyControl::on_menu_new() {
+    cout << "MyControl:on_menu_new()\n";
+    m_Maze->create(12, 12);
+}
+void MyControl::on_menu_quit() {
+    cout << "MyControl:on_menu_quit()\n";
+    m_AppWin->hide();
+}
+void MyControl::on_menu_file_save() {
+    cout << "MyControl:on_menu_file_save()\n";
+
+}
+void MyControl::on_menu_file_load() {
+    cout << "MyControl:on_menu_file_load()\n";
+
 }

@@ -19,6 +19,7 @@ class Maze : public Gtk::DrawingArea {
     public:
 	Maze(MyControl* i_Contr);
 	void create(int i_columns, int i_rows);
+	void deleteOld();
 	bool on_event_happend(GdkEvent *event);
 
 	bool isPaintable();
