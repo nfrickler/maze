@@ -2,6 +2,7 @@
 #define _MYCONTROL_H
 
 #include <gtkmm.h>
+#include <string>
 #include "Maze.h"
 #include "AppWin.h"
 
@@ -11,6 +12,7 @@ class MyControl {
 	MyControl();
 	AppWin* getAppWin();
 	Maze* getMaze();
+	void addExtension(std::string* path);
 
 	void runMaze();
 	void stopMaze();
@@ -25,6 +27,7 @@ class MyControl {
 	void on_menu_new();
 	void on_menu_quit();
 	void on_menu_file_save();
+	void on_menu_file_save_as();
 	void on_menu_file_load();
 	void on_menu_run();
 	void on_menu_stop();
@@ -37,6 +40,7 @@ class MyControl {
 	sigc::connection m_timer;
 	bool m_running;
 	bool m_paintview;
+	std::string m_path;
 };
 
 #endif // _MYCONTROL_H

@@ -2,6 +2,7 @@
 #include "MyControl.h"
 #include "Maze.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -44,11 +45,14 @@ void AppWin::drawMenu () {
 	Gtk::Action::create("FileNew", Gtk::Stock::NEW, "_New", "Create a new Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_new));
     m_refActionGroup->add(
-	Gtk::Action::create("FileLoad", Gtk::Stock::NEW, "Load Maze", "Load Maze from file"),
+	Gtk::Action::create("FileLoad", Gtk::Stock::OPEN, "Load Maze", "Load Maze from file"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_file_load));
     m_refActionGroup->add(
 	Gtk::Action::create("FileSave", Gtk::Stock::SAVE, "Save Maze", "Save Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_file_save));
+    m_refActionGroup->add(
+	Gtk::Action::create("FileSaveAs", Gtk::Stock::SAVE_AS, "Save Maze as", "Save Maze as"),
+	sigc::mem_fun(*m_Contr, &MyControl::on_menu_file_save_as));
     m_refActionGroup->add(
 	Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_quit));
@@ -75,11 +79,15 @@ void AppWin::drawMenu () {
 	"      <menuitem action='FileNew'/>"
 	"      <menuitem action='FileLoad'/>"
 	"      <menuitem action='FileSave'/>"
+	"      <menuitem action='FileSaveAs'/>"
 	"      <menuitem action='FileQuit'/>"
 	"    </menu>"
 	"  </menubar>"
 	"  <toolbar  name='ToolBar'>"
 	"    <toolitem action='FileNew'/>"
+	"    <toolitem action='FileLoad'/>"
+	"    <toolitem action='FileSave'/>"
+	"    <toolitem action='FileSaveAs'/>"
 	"    <toolitem action='Run'/>"
 	"    <toolitem action='Pause'/>"
 	"    <toolitem action='Stop'/>"
@@ -98,4 +106,52 @@ void AppWin::drawMenu () {
     if(pMenubar) m_vbox->pack_start(*pMenubar, Gtk::PACK_SHRINK);
     Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
     if(pToolbar) m_vbox->pack_start(*pToolbar, Gtk::PACK_SHRINK);
+}
+
+/* ask user for path
+ */
+std::string AppWin::getPath(Gtk::FileChooserAction type, const Gtk::BuiltinStockID button) {
+
+    // create dialog
+    Gtk::FileChooserDialog dialog("Please choose a file", type);
+    dialog.set_transient_for(*this);
+
+    // add buttons
+    dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    dialog.add_button(button, Gtk::RESPONSE_OK);
+
+    // filter: maze files
+    Glib::RefPtr<Gtk::FileFilter> filter_maze = Gtk::FileFilter::create();
+    filter_maze->set_name("Maze files");
+    filter_maze->add_pattern("*.maze");
+    dialog.add_filter(filter_maze);
+
+    // filter: all files
+    Glib::RefPtr<Gtk::FileFilter> filter_any = Gtk::FileFilter::create();
+    filter_any->set_name("All files");
+    filter_any->add_pattern("*");
+    dialog.add_filter(filter_any);
+
+    // ask user
+    int result = dialog.run();
+
+    // handle response
+    switch(result) {
+	case(Gtk::RESPONSE_OK): {
+	    cout << "Open clicked." << endl;
+	    std::string path = dialog.get_filename();
+	    cout << "File selected: " <<  path << endl;
+	    return path;
+	}
+	case(Gtk::RESPONSE_CANCEL): {
+	    cout << "Cancel clicked." << endl;
+	    break;
+	}
+	default: {
+	    cout << "Unexpected button clicked." << endl;
+	    break;
+	}
+    }
+
+    return "";
 }

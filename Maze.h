@@ -3,6 +3,7 @@
 
 #include <gtkmm/drawingarea.h>
 #include <map>
+#include <string>
 #include "Block.h"
 
 class MyControl;
@@ -42,6 +43,9 @@ class Maze : public Gtk::DrawingArea {
 	bool isBlock (int i_id);
 	bool isBlockExpanded(t_element* current, Block* block);
 	bool on_event_happend(GdkEvent *event);
+
+	bool saveMaze(const std::string* path);
+	bool loadMaze(const std::string* path);
 
     protected:
 	MyControl* m_Contr;

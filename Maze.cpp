@@ -2,6 +2,10 @@
 #include "MyControl.h"
 #include <cairomm/context.h>
 #include <iostream>
+#include <fstream>
+#include <istream>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -75,8 +79,8 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     cr->stroke();
 
     // get size of blocks
-    m_block_width = m_maze_width / m_rows;
-    m_block_height = m_maze_height / m_columns;
+    m_block_width = m_maze_width / m_columns;
+    m_block_height = m_maze_height / m_rows;
 
     // draw all blocks
     for (int i = 0; i < (m_rows * m_columns); i++) {
@@ -177,8 +181,8 @@ bool Maze::on_event_happend(GdkEvent *event) {
 	cout << "clicked: X= " << pos_x << " Y= " << pos_y << std::endl;
 
 	// get position of Block
-	int row = (int) (pos_x / m_block_width);
-	int column = (int) (pos_y / m_block_height);
+	int row = (int) (pos_y / m_block_height);
+	int column = (int) (pos_x / m_block_width);
 
 	// get id of block
 	int i = (row) * m_rows + column;
@@ -429,6 +433,72 @@ bool Maze::run (int) {
     expandNode(current);
 
     // draw
+    queue_draw();
+
+    return true;
+}
+
+/* save file
+ */
+bool Maze::saveMaze(const string* path) {
+    if (path == NULL) return false;
+    char c = '|';
+
+    // write
+    ofstream myfile;
+    myfile.open(path->c_str());
+    myfile << m_rows << c << m_columns << c;
+
+    // add all blocks
+    for (int i = 0; i < (int) m_blocks.size(); i++) {
+	myfile << m_blocks[i]->getType() << c;
+    }
+
+    myfile.close();
+    return true;
+}
+
+/* open file
+ */
+bool Maze::loadMaze(const string* path) {
+    if (path == NULL) return false;
+    char c = '|';
+    char d;
+    stringstream ss("");
+
+    // open for reading
+    ifstream myfile(path->c_str());
+
+    // get m_rows
+    d = 'a';
+    while (d != c) {
+	if (d != 'a') ss << d;
+	myfile >> d;
+    }
+    ss >> m_rows;
+
+    // get m_columns
+    d = 'a';
+    while (d != c) {
+	if (d != 'a') ss << d;
+	myfile >> d;
+    }
+    ss >> m_columns;
+
+    // create new maze
+    createMaze(m_rows, m_columns);
+
+    int i = 0;
+    d = 'a';
+    myfile >> d >> c;
+    while (!myfile.eof()) {
+	m_blocks[i]->setType(d - '0');
+	i++;
+	myfile >> d >> c;
+    }
+
+    myfile.close();
+
     queue_draw();
 
     return true;

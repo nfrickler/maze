@@ -1,5 +1,6 @@
 #include "MyControl.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -27,36 +28,87 @@ MyControl::MyControl () {
 AppWin* MyControl::getAppWin () { return m_AppWin; }
 Maze* MyControl::getMaze () { return m_Maze; }
 
-/* handle menu
+/* create new emtpy maze
  */
 void MyControl::on_menu_new() {
     cout << "MyControl:on_menu_new()\n";
     m_Maze->createMaze(12, 12);
 }
+
+/* quit
+ */
 void MyControl::on_menu_quit() {
     cout << "MyControl:on_menu_quit()\n";
     m_AppWin->hide();
 }
+
+/* save maze
+ */
 void MyControl::on_menu_file_save() {
     cout << "MyControl:on_menu_file_save()\n";
 
+    // is path?
+    if (m_path.length() == 0) {
+	m_path = m_AppWin->getPath(Gtk::FILE_CHOOSER_ACTION_SAVE, Gtk::Stock::SAVE);
+    }
+    if (m_path.length() == 0) return;
+
+    // add extension
+    addExtension(&m_path);
+
+    // save
+    m_Maze->saveMaze(&m_path);
 }
+
+/* save maze as
+ */
+void MyControl::on_menu_file_save_as() {
+    cout << "MyControl:on_menu_file_save_as()\n";
+
+    // get path
+    m_path = m_AppWin->getPath(Gtk::FILE_CHOOSER_ACTION_SAVE, Gtk::Stock::SAVE);
+    if (m_path.length() == 0) return;
+
+    // add extension
+    addExtension(&m_path);
+
+    // save
+    m_Maze->saveMaze(&m_path);
+}
+
+/* load maze from file
+ */
 void MyControl::on_menu_file_load() {
     cout << "MyControl:on_menu_file_load()\n";
 
+    // get path
+    m_path = m_AppWin->getPath(Gtk::FILE_CHOOSER_ACTION_OPEN, Gtk::Stock::OPEN);
+    if (m_path.length() == 0) return;
+
+    // load maze
+    m_Maze->loadMaze(&m_path);
 }
+
+/* run search
+ */
 void MyControl::on_menu_run() {
     cout << "MyControl:on_menu_run()\n";
     if (!initSearch()) return;
     startTimer();
     m_Maze->setPaintable(false);
 }
+
+/* stop search
+ */
 void MyControl::on_menu_stop() {
     cout << "MyControl:on_menu_stop()\n";
     stopTimer();
     clearSearch();
     m_Maze->setPaintable(true);
 }
+
+/* pause search
+ */
 void MyControl::on_menu_pause() {
     cout << "MyControl:on_menu_pause()\n";
     if (m_running) {
@@ -90,5 +142,17 @@ bool MyControl::initSearch () {
 }
 void MyControl::clearSearch () {
     m_Maze->clearSearch();
+}
+
+/* add extension to file if missing
+ */
+void MyControl::addExtension(std::string* path) {
+
+    // is extension?
+    string ext = ".maze";
+    if (path->rfind(ext, string::npos) != (path->size() - 5)) {
+	// add extension
+	*path += ext;
+    }
 }
 

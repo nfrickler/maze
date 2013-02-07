@@ -1,4 +1,7 @@
 #include "Block.h"
+#include <iostream>
+
+using namespace std;
 
 /* construct
  * @param int: id
@@ -65,8 +68,8 @@ bool Block::isRoot() { return (getType() == 2) ? true : false; }
 bool Block::isGoal() { return (getType() == 3) ? true : false; }
 bool Block::isSolid() { return (getType() == 1) ? true : false; }
 double Block::getX(int i_width) {
-    return m_row * i_width;
+    return m_column * i_width;
 }
 double Block::getY(int i_height) {
-    return m_column * i_height;
+    return m_row * i_height;
 }
