@@ -12,16 +12,23 @@ class MyControl {
 	AppWin* getAppWin();
 	Maze* getMaze();
 
-	void showPainter();
-	void startstopMaze();
 	void runMaze();
 	void stopMaze();
+
+	bool initSearch();
+	void clearSearch();
+
+	void startTimer();
+	void stopTimer();
 
 	//Signal handlers:
 	void on_menu_new();
 	void on_menu_quit();
 	void on_menu_file_save();
 	void on_menu_file_load();
+	void on_menu_run();
+	void on_menu_stop();
+	void on_menu_pause();
 
     protected:
 	Maze* m_Maze;

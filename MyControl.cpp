@@ -13,80 +13,25 @@ MyControl::MyControl () {
 
     // create new Maze object
     m_Maze = new Maze(this);
-    m_Maze->create(12, 12);
+    m_Maze->createMaze(12, 12);
+    m_Maze->setPaintable(true);
 
     // create new AppWin object
     m_AppWin = new AppWin(this);
 
-    // show Painter
-    showPainter();
+    // show Window
+    m_AppWin->showPainter(m_Maze);
 }
 
 /* getter */
 AppWin* MyControl::getAppWin () { return m_AppWin; }
 Maze* MyControl::getMaze () { return m_Maze; }
 
-/* show painter
- */
-void MyControl::showPainter() {
-    cout << "MyControl::showPainter()\n";
-
-    // show painter
-    if (!m_paintview) {
-	m_paintview = true;
-	m_AppWin->showPainter(m_Maze);
-    }
-
-    // make paintable
-    m_Maze->setPaintable(true);
-}
-
-/* slot for switching status of timer
- */
-void MyControl::startstopMaze () {
-    if (m_running) {
-	m_running = false;
-	m_Maze->setPaintable(true);
-	stopMaze();
-    } else {
-	m_running = true;
-	m_Maze->setPaintable(false);
-	runMaze();
-    }
-}
-
-/* run Maze
- */
-void MyControl::runMaze() {
-    cout << "MyControl::runMaze()\n";
-
-    // init search
-    if (!m_Maze->initSearch()) {
-	cout << "MyControl::runMaze(): ERROR\n";
-	showPainter();
-    }
-
-    // start timer
-    sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*m_Maze,
-	&Maze::run),0);
-    m_timer = Glib::signal_timeout().connect(my_slot, 1000);
-}
-
-/* stop timer
- */
-void MyControl::stopMaze() {
-    cout << "MyControl::stopMaze()\n";
-    m_timer.disconnect();
-
-    // back to painter
-    showPainter();
-}
-
-/* handle
+/* handle menu
  */
 void MyControl::on_menu_new() {
     cout << "MyControl:on_menu_new()\n";
-    m_Maze->create(12, 12);
+    m_Maze->createMaze(12, 12);
 }
 void MyControl::on_menu_quit() {
     cout << "MyControl:on_menu_quit()\n";
@@ -100,3 +45,50 @@ void MyControl::on_menu_file_load() {
     cout << "MyControl:on_menu_file_load()\n";
 
 }
+void MyControl::on_menu_run() {
+    cout << "MyControl:on_menu_run()\n";
+    if (!initSearch()) return;
+    startTimer();
+    m_Maze->setPaintable(false);
+}
+void MyControl::on_menu_stop() {
+    cout << "MyControl:on_menu_stop()\n";
+    stopTimer();
+    clearSearch();
+    m_Maze->setPaintable(true);
+}
+void MyControl::on_menu_pause() {
+    cout << "MyControl:on_menu_pause()\n";
+    if (m_running) {
+	stopTimer();
+    } else {
+	startTimer();
+    }
+}
+
+/* start/stop timer
+ */
+void MyControl::startTimer() {
+    m_running = true;
+    sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*m_Maze, &Maze::run),0);
+    m_timer = Glib::signal_timeout().connect(my_slot, 1000);
+}
+void MyControl::stopTimer() {
+    m_running = false;
+    m_timer.disconnect();
+}
+
+/* init/clear search
+ */
+bool MyControl::initSearch () {
+    clearSearch();
+    if (!m_Maze->initSearch()) {
+	cout << "MyControl::initSearch(): ERROR\n";
+	return false;
+    }
+    return true;
+}
+void MyControl::clearSearch () {
+    m_Maze->clearSearch();
+}
+

@@ -27,17 +27,8 @@ AppWin::AppWin (MyControl* i_Contr)
  */
 void AppWin::showPainter(Maze* i_Maze) {
 
-    // create elements
-    m_button_start = new Gtk::Button("Start/Stop");
-
-    // connect signals
-    m_button_start->signal_clicked().connect(
-	sigc::mem_fun(*m_Contr, &MyControl::startstopMaze)
-    );
-
     // set up structure
     m_vbox->pack_start(*i_Maze);
-    m_vbox->pack_end(*m_button_start, Gtk::PACK_SHRINK, 0);
 
     // show
     show_all_children();
@@ -49,19 +40,28 @@ void AppWin::drawMenu () {
     m_refActionGroup = Gtk::ActionGroup::create();
 
     // file menu
-    m_refActionGroup->add(Gtk::Action::create("FileNew",
-	Gtk::Stock::NEW, "_New", "Create a new Maze"),
+    m_refActionGroup->add(
+	Gtk::Action::create("FileNew", Gtk::Stock::NEW, "_New", "Create a new Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_new));
-    m_refActionGroup->add(Gtk::Action::create("FileLoad",
-	Gtk::Stock::NEW, "Load Maze", "Load Maze from file"),
+    m_refActionGroup->add(
+	Gtk::Action::create("FileLoad", Gtk::Stock::NEW, "Load Maze", "Load Maze from file"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_file_load));
-    m_refActionGroup->add(Gtk::Action::create("FileSave",
-	Gtk::Stock::NEW, "Save Maze", "Save Maze"),
+    m_refActionGroup->add(
+	Gtk::Action::create("FileSave", Gtk::Stock::SAVE, "Save Maze", "Save Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_file_save));
     m_refActionGroup->add(
 	Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_quit));
     m_refActionGroup->add(Gtk::Action::create("FileMenu", "File"));
+    m_refActionGroup->add(
+	Gtk::Action::create("Run", Gtk::Stock::MEDIA_PLAY, "Run Maze", "Run Maze"),
+	sigc::mem_fun(*m_Contr, &MyControl::on_menu_run));
+    m_refActionGroup->add(
+	Gtk::Action::create("Pause", Gtk::Stock::MEDIA_PAUSE, "Pause Maze", "Pause Maze"),
+	sigc::mem_fun(*m_Contr, &MyControl::on_menu_pause));
+    m_refActionGroup->add(
+	Gtk::Action::create("Stop", Gtk::Stock::MEDIA_STOP, "Stop Maze", "Stop Maze"),
+	sigc::mem_fun(*m_Contr, &MyControl::on_menu_stop));
 
     m_refUIManager = Gtk::UIManager::create();
     m_refUIManager->insert_action_group(m_refActionGroup);
@@ -80,6 +80,9 @@ void AppWin::drawMenu () {
 	"  </menubar>"
 	"  <toolbar  name='ToolBar'>"
 	"    <toolitem action='FileNew'/>"
+	"    <toolitem action='Run'/>"
+	"    <toolitem action='Pause'/>"
+	"    <toolitem action='Stop'/>"
 	"    <toolitem action='FileQuit'/>"
 	"  </toolbar>"
 	"</ui>";

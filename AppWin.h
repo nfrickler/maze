@@ -10,15 +10,12 @@ class AppWin : public Gtk::Window {
 
     public:
 	AppWin(MyControl* i_Contr);
-	void askForMaze();
 	void showPainter(Maze* i_Maze);
 
     protected:
 	MyControl* m_Contr;
 
 	Gtk::Button* m_button_paint;
-	Gtk::Button* m_button_start;
-	Gtk::HBox* m_hbox;
 	Gtk::VBox* m_vbox;
 
 	Glib::RefPtr<Gtk::UIManager> m_refUIManager;
