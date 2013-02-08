@@ -12,6 +12,7 @@ using namespace std;
 Block::Block(int i_id, int i_row, int i_column, int i_type)
     : m_id(i_id), m_row(i_row), m_column(i_column), m_type(i_type)
 {
+    m_isexpanded = false;
 
 }
 
@@ -73,3 +74,5 @@ double Block::getX(int i_width) {
 double Block::getY(int i_height) {
     return m_row * i_height;
 }
+void Block::setExpanded(bool i_exp) { m_isexpanded = i_exp; }
+bool Block::isExpanded() { return m_isexpanded; }

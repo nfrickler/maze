@@ -12,6 +12,8 @@ class Block {
 	void setType(int i_type);
 	int getType();
 	int getId();
+	bool isExpanded();
+	void setExpanded(bool);
 	bool isRoot();
 	bool isGoal();
 	bool isSolid();
@@ -23,6 +25,7 @@ class Block {
 	int m_row;
 	int m_column;
 	int m_type;
+	bool m_isexpanded;
 };
 
 #endif // _BLOCK_H

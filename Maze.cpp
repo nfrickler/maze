@@ -59,6 +59,19 @@ void Maze::deleteMaze () {
     m_blocks.clear();
 }
 
+/* is Block with this id?
+ * @param int: id
+ */
+bool Maze::isBlock (int i_id) {
+    return (m_blocks.find(i_id) != m_blocks.end()) ? true : false;
+}
+
+/* getter and setter */
+bool Maze::isPaintable() { return m_is_paintable; }
+void Maze::setPaintable(bool i_bool) { m_is_paintable = i_bool; }
+
+/* ############################## draw ###################################### */
+
 /* draw
  */
 bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
@@ -83,7 +96,7 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     m_block_height = m_maze_height / m_rows;
 
     // draw all blocks
-    for (int i = 0; i < (m_rows * m_columns); i++) {
+    for (int i = 0; i < (int) m_blocks.size(); i++) {
 	m_blocks[i]->drawme(cr, m_block_width, m_block_height);
     }
 
@@ -219,16 +232,7 @@ bool Maze::on_event_happend(GdkEvent *event) {
     return false;
 }
 
-/* is Block with this id?
- * @param int: id
- */
-bool Maze::isBlock (int i_id) {
-    return (m_blocks.find(i_id) != m_blocks.end()) ? true : false;
-}
-
-/* getter and setter */
-bool Maze::isPaintable() { return m_is_paintable; }
-void Maze::setPaintable(bool i_bool) { m_is_paintable = i_bool; }
+/* ############################# search ##################################### */
 
 /* init search tree
  */
@@ -255,6 +259,11 @@ void Maze::clearSearch() {
 
     // empty m_stree
     removeTree(m_stree);
+
+    // unset all expand information
+    for (int i = 0; i < (int) m_blocks.size(); i++) {
+	m_blocks[i]->setExpanded(false);
+    }
 
     // set NULL
     m_sexpand = NULL;
@@ -291,7 +300,6 @@ t_element* Maze::createNode (Block* i_Block) {
     // fill
     out->block = i_Block;
     out->sum = 0;
-    out->is_expanded = false;
     out->root = NULL;
     out->sub1 = NULL;
     out->sub2 = NULL;
@@ -304,7 +312,6 @@ t_element* Maze::createNode (Block* i_Block) {
 /* add to list
  */
 void Maze::addToExpandList (t_element* newone) {
-    cout << "Add to list " << newone->block->getId() << " (" << newone->sum << ")\n";
     t_element* current = m_sexpand;
     int pos = 0;
 
@@ -314,8 +321,6 @@ void Maze::addToExpandList (t_element* newone) {
 	current = current->next;
 	pos++;
     }
-
-    cout << "Add element in list at pos = " << pos << "\n";
 
     // add to list
     if (current == NULL) {
@@ -331,7 +336,7 @@ void Maze::addToExpandList (t_element* newone) {
  */
 bool Maze::expandNode (t_element* current) {
     int id = current->block->getId();
-    current->is_expanded = true;
+    current->block->setExpanded(true);
     cout << "Expand node " << id << "\n";
 
     // get ids of neigbours
@@ -387,7 +392,7 @@ bool Maze::expandNode (t_element* current) {
 bool Maze::isBlockExpanded (t_element* current, Block* block) {
 
     // found?
-    if (current->block == block && current->is_expanded) return true;
+    if (current->block == block && current->block->isExpanded()) return true;
 
     // search sub elements
     if (current->sub1 != NULL && isBlockExpanded(current->sub1, block))
@@ -405,12 +410,18 @@ bool Maze::isBlockExpanded (t_element* current, Block* block) {
 bool Maze::run (int) {
     cout << "Maze::run()\n";
 
+    t_element* ccc = m_sexpand;
+    while (ccc != NULL) {
+	cerr << "in list: " << ccc->block->getId() << " - sum: " << ccc->sum << " - exp: " << (ccc->block->isExpanded() ? "true" : "false") << "\n";
+	ccc = ccc->next;
+    }
+
     // get next node to expand
     t_element* current = m_sexpand;
-    while (current != NULL && current->is_expanded) {
+    while (current != NULL && current->block->isExpanded()) {
 	current = current->next;
     }
-    m_sexpand = current;
+    m_sexpand = current->next;
 
     // is node?
     if (current == NULL) {
@@ -437,6 +448,8 @@ bool Maze::run (int) {
 
     return true;
 }
+
+/* ########################## save/load ##################################### */
 
 /* save file
  */

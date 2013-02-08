@@ -10,7 +10,7 @@ MyControl::MyControl () {
 
     // init
     m_running = false;
-    m_paintview = false;
+    m_paused = false;
 
     // create new Maze object
     m_Maze = new Maze(this);
@@ -32,7 +32,10 @@ Maze* MyControl::getMaze () { return m_Maze; }
  */
 void MyControl::on_menu_new() {
     cout << "MyControl:on_menu_new()\n";
+    stopTimer();
+    m_path = "";
     m_Maze->createMaze(12, 12);
+    m_Maze->setPaintable(true);
 }
 
 /* quit
@@ -80,6 +83,7 @@ void MyControl::on_menu_file_save_as() {
  */
 void MyControl::on_menu_file_load() {
     cout << "MyControl:on_menu_file_load()\n";
+    stopTimer();
 
     // get path
     m_path = m_AppWin->getPath(Gtk::FILE_CHOOSER_ACTION_OPEN, Gtk::Stock::OPEN);
@@ -87,6 +91,7 @@ void MyControl::on_menu_file_load() {
 
     // load maze
     m_Maze->loadMaze(&m_path);
+    m_Maze->setPaintable(true);
 }
 
 /* run search
@@ -113,8 +118,12 @@ void MyControl::on_menu_pause() {
     cout << "MyControl:on_menu_pause()\n";
     if (m_running) {
 	stopTimer();
-    } else {
+	m_paused = true;
+    } else if (m_paused) {
+	cout << "start it\n";
 	startTimer();
+    } else {
+	cout << "ERROR: Search is not paused!\n";
     }
 }
 
@@ -122,11 +131,13 @@ void MyControl::on_menu_pause() {
  */
 void MyControl::startTimer() {
     m_running = true;
+    m_paused = false;
     sigc::slot<bool> my_slot = sigc::bind(sigc::mem_fun(*m_Maze, &Maze::run),0);
     m_timer = Glib::signal_timeout().connect(my_slot, 1000);
 }
 void MyControl::stopTimer() {
     m_running = false;
+    m_paused = false;
     m_timer.disconnect();
 }
 

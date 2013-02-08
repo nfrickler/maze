@@ -38,8 +38,8 @@ class MyControl {
 	AppWin* m_AppWin;
 
 	sigc::connection m_timer;
+	bool m_paused;
 	bool m_running;
-	bool m_paintview;
 	std::string m_path;
 };
 
