@@ -5,10 +5,10 @@
 #include <iostream>
 #include <fstream>
 #include <istream>
-#include <string>
 #include <sstream>
 
 #include "Search.h"
+#include "SearchBreadthFirst.h"
 
 const Gdk::Color BLOCK_COLORS[BLOCK_NAMES_SIZE] = {
     Gdk::Color("white"),
@@ -30,16 +30,19 @@ using namespace std;
 Maze::Maze (MyControl* i_Contr)
     : m_Contr(i_Contr)
 {
-    this->add_events(Gdk::BUTTON_PRESS_MASK);
-    this->signal_event().connect(
-	sigc::mem_fun(*this, &Maze::on_event_happend)
-    );
+    // init
     m_is_paintable = true;
     m_msg = "";
 
     // init Search objects
     m_searchtype = 0;
-    m_Search[m_searchtype] = new Search(this);
+    m_Search[m_searchtype] = new SearchBreadthFirst(this);
+
+    // catch mouseclicks on maze
+    this->add_events(Gdk::BUTTON_PRESS_MASK);
+    this->signal_event().connect(
+	sigc::mem_fun(*this, &Maze::on_event_happend)
+    );
 }
 
 /* create empty Maze

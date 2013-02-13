@@ -20,27 +20,28 @@ class Search {
 	Search(Maze* i_Maze);
 
 	// search
-	bool init(int i_rows, int i_columns);
 	void clear();
 	t_element* createNode(Block* i_Block);
-	bool expandNode(t_element*);
-	void addToExpandList(t_element* newone);
-	int run();
 	void removeTree(t_element* current);
 
 	// status
 	bool isBlockExpanded(t_element* current, Block* block);
 
+	// drawing
 	void drawTree(const Cairo::RefPtr<Cairo::Context>& cr, t_element* current, int i_block_width, int i_block_height);
+
+	// to be implemented in childs
+	virtual bool init(int i_rows, int i_columns);
+	virtual int run();
+	virtual void addToExpandList(t_element* newone);
+	virtual bool expandNode(t_element*);
 
     protected:
 	Maze* m_Maze;
 
-	// searching
+	// lists and trees
 	t_element* m_stree;
 	t_element* m_sexpand;
-
-
 };
 
 #endif // _SEARCH_H

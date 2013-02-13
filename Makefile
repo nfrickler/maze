@@ -1,8 +1,8 @@
 
 LIBS = -ggdb `pkg-config gtkmm-3.0 --cflags --libs`
 
-all: main.o MyControl.o Maze.o AppWin.o Block.o Search.o
-	g++ -Wall -o maze main.o MyControl.o Maze.o AppWin.o Block.o Search.o ${LIBS}
+all: main.o MyControl.o Maze.o AppWin.o Block.o Search.o SearchBreadthFirst.o
+	g++ -Wall -o maze main.o MyControl.o Maze.o AppWin.o Block.o Search.o SearchBreadthFirst.o ${LIBS}
 
 main.o: main.cpp
 	g++ -Wall -c main.cpp ${LIBS}
@@ -16,6 +16,8 @@ Block.o: Block.cpp
 	g++ -Wall -c Block.cpp ${LIBS}
 Search.o: Search.cpp
 	g++ -Wall -c Search.cpp ${LIBS}
+SearchBreadthFirst.o: SearchBreadthFirst.cpp
+	g++ -Wall -c SearchBreadthFirst.cpp ${LIBS}
 
 clean:
 	rm *.o
