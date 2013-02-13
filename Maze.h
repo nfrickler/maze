@@ -55,6 +55,8 @@ class Maze : public Gtk::DrawingArea {
 	bool saveMaze(const std::string* path);
 	bool loadMaze(const std::string* path);
 
+	void setMsg(const char* i_msg);
+
     protected:
 	MyControl* m_Contr;
 
@@ -63,6 +65,7 @@ class Maze : public Gtk::DrawingArea {
 	int m_columns;
 	int m_rows;
 	bool m_is_paintable;
+	const char* m_msg;
 
 	// drawing
 	int m_maze_width, m_maze_height;

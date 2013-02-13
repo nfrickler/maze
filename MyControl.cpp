@@ -14,8 +14,7 @@ MyControl::MyControl () {
 
     // create new Maze object
     m_Maze = new Maze(this);
-    m_Maze->createMaze(12, 12);
-    m_Maze->setPaintable(true);
+    on_menu_new();
 
     // create new AppWin object
     m_AppWin = new AppWin(this);
@@ -32,6 +31,7 @@ Maze* MyControl::getMaze () { return m_Maze; }
  */
 void MyControl::on_menu_new() {
     cout << "MyControl:on_menu_new()\n";
+    m_Maze->setMsg("Create/Load new maze");
     stopTimer();
     m_path = "";
     m_Maze->createMaze(12, 12);
@@ -90,6 +90,7 @@ void MyControl::on_menu_file_load() {
     if (m_path.length() == 0) return;
 
     // load maze
+    m_Maze->setMsg("Create/Load new maze");
     m_Maze->loadMaze(&m_path);
     m_Maze->setPaintable(true);
 }
@@ -99,6 +100,7 @@ void MyControl::on_menu_file_load() {
 void MyControl::on_menu_run() {
     cout << "MyControl:on_menu_run()\n";
     if (!initSearch()) return;
+    m_Maze->setMsg("Running...");
     startTimer();
     m_Maze->setPaintable(false);
 }
@@ -107,6 +109,7 @@ void MyControl::on_menu_run() {
  */
 void MyControl::on_menu_stop() {
     cout << "MyControl:on_menu_stop()\n";
+    m_Maze->setMsg("Stopped");
     stopTimer();
     clearSearch();
     m_Maze->setPaintable(true);
@@ -117,13 +120,14 @@ void MyControl::on_menu_stop() {
 void MyControl::on_menu_pause() {
     cout << "MyControl:on_menu_pause()\n";
     if (m_running) {
+	m_Maze->setMsg("Paused");
 	stopTimer();
 	m_paused = true;
     } else if (m_paused) {
-	cout << "start it\n";
+	m_Maze->setMsg("Running...");
 	startTimer();
     } else {
-	cout << "ERROR: Search is not paused!\n";
+	cerr << "ERROR: Search is not paused!\n";
     }
 }
 
@@ -146,7 +150,7 @@ void MyControl::stopTimer() {
 bool MyControl::initSearch () {
     clearSearch();
     if (!m_Maze->initSearch()) {
-	cout << "MyControl::initSearch(): ERROR\n";
+	cerr << "MyControl::initSearch(): ERROR\n";
 	return false;
     }
     return true;

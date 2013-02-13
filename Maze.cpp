@@ -33,6 +33,7 @@ Maze::Maze (MyControl* i_Contr)
 	sigc::mem_fun(*this, &Maze::on_event_happend)
     );
     m_is_paintable = true;
+    m_msg = "";
 }
 
 /* create empty Maze
@@ -83,6 +84,11 @@ bool Maze::isBlock (int i_id) {
 /* getter and setter */
 bool Maze::isPaintable() { return m_is_paintable; }
 void Maze::setPaintable(bool i_bool) { m_is_paintable = i_bool; }
+void Maze::setMsg(const char* i_msg) {
+    cout << "Msg: " << i_msg << "\n";
+    m_msg = i_msg;
+    queue_draw();
+}
 
 /* ############################## draw ###################################### */
 
@@ -90,20 +96,10 @@ void Maze::setPaintable(bool i_bool) { m_is_paintable = i_bool; }
  */
 bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
+    // get current width and height
     Gtk::Allocation allocation = get_allocation();
     m_maze_width = allocation.get_width();
     m_maze_height = allocation.get_height() - SIZEOFLEGEND;
-
-    cr->set_line_width(5.0);
-
-    // mark end of field
-    cr->set_source_rgb(0.8, 0.0, 0.0);
-    cr->move_to(0,0);
-    cr->line_to(m_maze_width,0);
-    cr->line_to(m_maze_width,m_maze_height);
-    cr->line_to(0,m_maze_height);
-    cr->line_to(0,0);
-    cr->stroke();
 
     // get size of blocks
     m_block_width = m_maze_width / m_columns;
@@ -113,11 +109,6 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     for (int i = 0; i < (int) m_blocks.size(); i++) {
 	m_blocks[i]->drawme(cr, m_block_width, m_block_height);
     }
-
-    // print some information
-    stringstream ss;
-    ss << "Maze";
-    drawText(cr, ss.str().c_str());
 
     // print expanded search tree
     if (!isPaintable()) {
@@ -150,14 +141,9 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	drawText(cr, BLOCK_NAMES[i]);
     }
 
-    // draw status
-    if (isPaintable()) {
-	msg = "Draw/load/edit maze";
-    } else {
-	msg = "Running...";
-    }
+    // draw msg
     cr->move_to(m_maze_width/2+LEGENDPADDING, m_maze_height+LEGENDPADDING);
-    drawText(cr, msg);
+    drawText(cr, m_msg);
 
     return true;
 }
@@ -318,7 +304,7 @@ t_element* Maze::createNode (Block* i_Block) {
     // get new node
     t_element* out = (t_element*) malloc(sizeof(t_element));
     if (out == NULL) {
-	cout << "Malloc failed!\n";
+	cerr << "Malloc failed!\n";
 	return NULL;
     }
 
@@ -438,7 +424,6 @@ bool Maze::run (int) {
 
     t_element* ccc = m_sexpand;
     while (ccc != NULL) {
-	cerr << "in list: " << ccc->block->getId() << " - sum: " << ccc->sum << " - exp: " << (ccc->block->isExpanded() ? "true" : "false") << "\n";
 	ccc = ccc->next;
     }
 
@@ -447,22 +432,22 @@ bool Maze::run (int) {
     while (current != NULL && current->block->isExpanded()) {
 	current = current->next;
     }
-    m_sexpand = current->next;
 
     // is node?
     if (current == NULL) {
-	cout << "ERROR: empty list or goal unreachable!\n";
 	m_Contr->on_menu_stop();
+	setMsg("Goal unreachable!");
 	return false;
     }
 
-    // update next
+    // update list
+    m_sexpand = current->next;
     current->next = NULL;
 
     // reached goal?
     if (current->block->isGoal()) {
-	cout << "Reached goal!\n";
 	m_Contr->on_menu_pause();
+	setMsg("Reached goal!");
 	return false;
     }
 
