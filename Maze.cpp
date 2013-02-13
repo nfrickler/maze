@@ -172,48 +172,16 @@ void Maze::drawTree(const Cairo::RefPtr<Cairo::Context>& cr, t_element* current)
     double pos_from_x = current->block->getX(m_block_width) + m_block_width/2;
     double pos_from_y = current->block->getY(m_block_height) + m_block_height/2;
 
-    // draw line to sub1
-    if (current->sub1 != NULL) {
-	double pos_to_x = current->sub1->block->getX(m_block_width) + m_block_width/2;
-	double pos_to_y = current->sub1->block->getY(m_block_height) + m_block_height/2;
+    // draw lines
+    for (int i = 0; i < (int) (sizeof(current->subs)/sizeof(t_element*)); i++) {
+	if (current->subs[i] == NULL) break;
+	double pos_to_x = current->subs[i]->block->getX(m_block_width) + m_block_width/2;
+	double pos_to_y = current->subs[i]->block->getY(m_block_height) + m_block_height/2;
 	cr->move_to(0,0);
 	cr->move_to(pos_from_x, pos_from_y);
 	cr->line_to(pos_to_x, pos_to_y);
 	cr->stroke();
-	drawTree(cr, current->sub1);
-    }
-
-    // draw line to sub2
-    if (current->sub2 != NULL) {
-	double pos_to_x = current->sub2->block->getX(m_block_width) + m_block_width/2;
-	double pos_to_y = current->sub2->block->getY(m_block_height) + m_block_height/2;
-	cr->move_to(0,0);
-	cr->move_to(pos_from_x, pos_from_y);
-	cr->line_to(pos_to_x, pos_to_y);
-	cr->stroke();
-	drawTree(cr, current->sub2);
-    }
-
-    // draw line to sub3
-    if (current->sub3 != NULL) {
-	double pos_to_x = current->sub3->block->getX(m_block_width) + m_block_width/2;
-	double pos_to_y = current->sub3->block->getY(m_block_height) + m_block_height/2;
-	cr->move_to(0,0);
-	cr->move_to(pos_from_x, pos_from_y);
-	cr->line_to(pos_to_x, pos_to_y);
-	cr->stroke();
-	drawTree(cr, current->sub3);
-    }
-
-    // draw line to sub4
-    if (current->sub4 != NULL) {
-	double pos_to_x = current->sub4->block->getX(m_block_width) + m_block_width/2;
-	double pos_to_y = current->sub4->block->getY(m_block_height) + m_block_height/2;
-	cr->move_to(0,0);
-	cr->move_to(pos_from_x, pos_from_y);
-	cr->line_to(pos_to_x, pos_to_y);
-	cr->stroke();
-	drawTree(cr, current->sub4);
+	drawTree(cr, current->subs[i]);
     }
 }
 
@@ -334,10 +302,10 @@ void Maze::removeTree(t_element* current) {
     if (current == NULL) return;
 
     // remove subs
-    if (current->sub1 != NULL) removeTree(current->sub1);
-    if (current->sub2 != NULL) removeTree(current->sub2);
-    if (current->sub3 != NULL) removeTree(current->sub3);
-    if (current->sub4 != NULL) removeTree(current->sub4);
+    for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
+	if (current->subs[i] != NULL) removeTree(current->subs[i]);
+
+    }
 
     // remove this element
     free(current);
@@ -358,10 +326,10 @@ t_element* Maze::createNode (Block* i_Block) {
     out->block = i_Block;
     out->sum = 0;
     out->root = NULL;
-    out->sub1 = NULL;
-    out->sub2 = NULL;
-    out->sub3 = NULL;
-    out->sub4 = NULL;
+
+    for (int i = 0; i < (int) (sizeof(out->subs)/(sizeof(t_element*))); i++) {
+	out->subs[i] = NULL;
+    }
     out->next = NULL;
 
     return out;
@@ -404,6 +372,10 @@ bool Maze::expandNode (t_element* current) {
 	(id - 1) // left
     };
 
+    // is right/left in same row?
+    if (neighbours[2]/m_columns != id/m_columns) neighbours[2] = -1;
+    if (neighbours[3]/m_columns != id/m_columns) neighbours[3] = -1;
+
     // add new elements to list
     for (int i = 0; i < 4; i++) {
 
@@ -425,14 +397,11 @@ bool Maze::expandNode (t_element* current) {
 	}
 
 	// add this element as sub to current
-	if (current->sub1 == NULL) {
-	    current->sub1 = elem;
-	} else if (current->sub2 == NULL) {
-	    current->sub2 = elem;
-	} else if (current->sub3 == NULL) {
-	    current->sub3 = elem;
-	} else {
-	    current->sub4 = elem;
+	for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
+	    if (current->subs[i] == NULL) {
+		current->subs[i] = elem;
+		break;
+	    }
 	}
 
 	// set root and new sum
@@ -454,14 +423,10 @@ bool Maze::isBlockExpanded (t_element* current, Block* block) {
     if (current->block == block && current->block->isExpanded()) return true;
 
     // search sub elements
-    if (current->sub1 != NULL && isBlockExpanded(current->sub1, block))
-	return true;
-    if (current->sub2 != NULL && isBlockExpanded(current->sub2, block))
-	return true;
-    if (current->sub3 != NULL && isBlockExpanded(current->sub3, block))
-	return true;
-    if (current->sub4 != NULL && isBlockExpanded(current->sub4, block))
-	return true;
+    for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
+	if (current->subs[i] != NULL && isBlockExpanded(current->subs[i], block))
+	    return true;
+    }
 
     return false;
 }
