@@ -1,4 +1,5 @@
 #include "Maze.h"
+#include "Block.h"
 #include "MyControl.h"
 #include <cairomm/context.h>
 #include <iostream>
@@ -6,6 +7,19 @@
 #include <istream>
 #include <string>
 #include <sstream>
+
+const Gdk::Color BLOCK_COLORS[BLOCK_NAMES_SIZE] = {
+    Gdk::Color("white"),
+    Gdk::Color("black"),
+    Gdk::Color("blue"),
+    Gdk::Color("red")
+};
+const char* BLOCK_NAMES[BLOCK_NAMES_SIZE] = {
+    "Free",
+    "Blocked",
+    "Start",
+    "Goal"
+};
 
 using namespace std;
 
@@ -78,7 +92,7 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
     Gtk::Allocation allocation = get_allocation();
     m_maze_width = allocation.get_width();
-    m_maze_height = allocation.get_height();
+    m_maze_height = allocation.get_height() - SIZEOFLEGEND;
 
     cr->set_line_width(5.0);
 
@@ -101,8 +115,6 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     }
 
     // print some information
-    cr->move_to(0,0);
-    cr->set_source_rgb(0.0, 0.0, 0.0);
     stringstream ss;
     ss << "Maze";
     drawText(cr, ss.str().c_str());
@@ -113,6 +125,39 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	cr->set_source_rgb(0.8, 0.0, 0.0);
 	drawTree(cr, m_stree);
     }
+
+    // draw legend
+    const char* msg = "Legend";
+    cr->set_source_rgb(0.0, 0.0, 0.0);
+    cr->move_to(0, m_maze_height+LEGENDPADDING);
+    drawText(cr, msg);
+
+    // draw legend blocks
+    for (int i = 0; i < (int) (sizeof(BLOCK_COLORS)/sizeof(Gdk::Color)); i++) {
+	const int pos_x = LEGENDPADDING+i*LEGEND_BLOCK_SPACE;
+	const int pos_y = m_maze_height+LEGENDPADDING+LEGEND_BLOCK_POSY;
+	cr->set_source_rgb(
+	    BLOCK_COLORS[i].get_red_p(),
+	    BLOCK_COLORS[i].get_green_p(),
+	    BLOCK_COLORS[i].get_blue_p()
+	);
+	cr->rectangle(pos_x, pos_y, LEGEND_BLOCK_WIDTH, LEGEND_BLOCK_HEIGHT);
+	cr->fill();
+
+	// label
+	cr->set_source_rgb(0.0, 0.0, 0.0);
+	cr->move_to(pos_x + LEGEND_BLOCK_WIDTH + LEGENDPADDING, pos_y);
+	drawText(cr, BLOCK_NAMES[i]);
+    }
+
+    // draw status
+    if (isPaintable()) {
+	msg = "Draw/load/edit maze";
+    } else {
+	msg = "Running...";
+    }
+    cr->move_to(m_maze_width/2+LEGENDPADDING, m_maze_height+LEGENDPADDING);
+    drawText(cr, msg);
 
     return true;
 }
@@ -317,7 +362,6 @@ void Maze::addToExpandList (t_element* newone) {
 
     // forward to right place
     while (current != NULL && current->next != NULL && current->next->sum <= newone->sum) {
-	cout << " - sum=" << current->sum << "\n";
 	current = current->next;
 	pos++;
     }

@@ -1,4 +1,5 @@
 #include "Block.h"
+#include "Maze.h"
 #include <iostream>
 
 using namespace std;
@@ -32,20 +33,12 @@ bool Block::drawme(Cairo::RefPtr<Cairo::Context> cr, double i_width, double i_he
 
     // draw
     cr->move_to(0,0);
-    switch (m_type) {
-	case 1:
-	    cr->set_source_rgb(0.0, 0.0, 0.0);
-	    break;
-	case 2:
-	    cr->set_source_rgb(0.0, 0.0, 1.0);
-	    break;
-	case 3:
-	    cr->set_source_rgb(1.0, 0.0, 0.0);
-	    break;
-	default:
-	    cr->set_source_rgb(1.0, 1.0, 1.0);
-	    break;
-    }
+    if (m_type < 0 || m_type >= (int) (sizeof(BLOCK_COLORS)/sizeof(Gdk::Color))) m_type = 0;
+    cr->set_source_rgb(
+	BLOCK_COLORS[m_type].get_red_p(),
+	BLOCK_COLORS[m_type].get_green_p(),
+	BLOCK_COLORS[m_type].get_blue_p()
+    );
     cr->rectangle(pos_x, pos_y, i_width, i_height);
     cr->fill();
 

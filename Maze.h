@@ -4,9 +4,20 @@
 #include <gtkmm/drawingarea.h>
 #include <map>
 #include <string>
-#include "Block.h"
+
+const int SIZEOFLEGEND = 70;
+const int LEGENDPADDING = 5;
+const int LEGEND_BLOCK_POSY = 35;
+const int LEGEND_BLOCK_WIDTH = 30;
+const int LEGEND_BLOCK_HEIGHT = 20;
+const int LEGEND_BLOCK_SPACE = 120;
+const int BLOCK_NAMES_SIZE = 4;
+
+extern const Gdk::Color BLOCK_COLORS[BLOCK_NAMES_SIZE];
+extern const char* BLOCK_NAMES[BLOCK_NAMES_SIZE];
 
 class MyControl;
+class Block;
 
 typedef struct s_element {
     Block* block;
