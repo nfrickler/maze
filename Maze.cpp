@@ -8,6 +8,8 @@
 #include <string>
 #include <sstream>
 
+#include "Search.h"
+
 const Gdk::Color BLOCK_COLORS[BLOCK_NAMES_SIZE] = {
     Gdk::Color("white"),
     Gdk::Color("black"),
@@ -34,6 +36,10 @@ Maze::Maze (MyControl* i_Contr)
     );
     m_is_paintable = true;
     m_msg = "";
+
+    // init Search objects
+    m_searchtype = 0;
+    m_Search[m_searchtype] = new Search(this);
 }
 
 /* create empty Maze
@@ -78,12 +84,24 @@ void Maze::deleteMaze () {
  * @param int: id
  */
 bool Maze::isBlock (int i_id) {
-    return (m_blocks.find(i_id) != m_blocks.end()) ? true : false;
+    return (getBlock(i_id) == NULL) ? false : true;
+}
+
+/* get number of blocks
+ */
+int Maze::getMaxId() { return m_blocks.size(); }
+
+/* get Block object with certain id
+ * @param int: id
+ */
+Block* Maze::getBlock(int i_id) {
+    return (m_blocks.find(i_id) != m_blocks.end()) ? m_blocks[i_id] : NULL;
 }
 
 /* getter and setter */
 bool Maze::isPaintable() { return m_is_paintable; }
 void Maze::setPaintable(bool i_bool) { m_is_paintable = i_bool; }
+int Maze::getColumnNum() { return m_columns; }
 void Maze::setMsg(const char* i_msg) {
     cout << "Msg: " << i_msg << "\n";
     m_msg = i_msg;
@@ -114,7 +132,7 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     if (!isPaintable()) {
 	cr->set_line_width(5.0);
 	cr->set_source_rgb(0.8, 0.0, 0.0);
-	drawTree(cr, m_stree);
+	m_Search[m_searchtype]->drawTree(cr, NULL, m_block_width, m_block_height);
     }
 
     // draw legend
@@ -146,29 +164,6 @@ bool Maze::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     drawText(cr, m_msg);
 
     return true;
-}
-
-/* draw tree
- * @param cr: cairo
- * @param t_element*: element to draw
- */
-void Maze::drawTree(const Cairo::RefPtr<Cairo::Context>& cr, t_element* current) {
-
-    // get position of current
-    double pos_from_x = current->block->getX(m_block_width) + m_block_width/2;
-    double pos_from_y = current->block->getY(m_block_height) + m_block_height/2;
-
-    // draw lines
-    for (int i = 0; i < (int) (sizeof(current->subs)/sizeof(t_element*)); i++) {
-	if (current->subs[i] == NULL) break;
-	double pos_to_x = current->subs[i]->block->getX(m_block_width) + m_block_width/2;
-	double pos_to_y = current->subs[i]->block->getY(m_block_height) + m_block_height/2;
-	cr->move_to(0,0);
-	cr->move_to(pos_from_x, pos_from_y);
-	cr->line_to(pos_to_x, pos_to_y);
-	cr->stroke();
-	drawTree(cr, current->subs[i]);
-    }
 }
 
 /* draw text
@@ -247,212 +242,31 @@ bool Maze::on_event_happend(GdkEvent *event) {
 /* init search tree
  */
 bool Maze::initSearch() {
-    m_stree = NULL;
-
-    // get root and goal
-    for (int i = 0; i < (m_rows * m_columns); i++) {
-	if (m_blocks[i]->isRoot()) {
-	    if (m_stree != NULL) return false;
-	    m_stree = createNode(m_blocks[i]);
-	}
-    }
-
-    // add to expand list
-    m_sexpand = m_stree;
-
-    return (m_sexpand == NULL) ? false : true;
+    return m_Search[m_searchtype]->init(m_rows, m_columns);
 }
 
-/* clear search
+/* clear search tree
  */
 void Maze::clearSearch() {
-
-    // empty m_stree
-    removeTree(m_stree);
-
-    // unset all expand information
-    for (int i = 0; i < (int) m_blocks.size(); i++) {
-	m_blocks[i]->setExpanded(false);
-    }
-
-    // set NULL
-    m_sexpand = NULL;
-    m_stree = NULL;
-}
-
-/* loop through tree
- */
-void Maze::removeTree(t_element* current) {
-
-    // is element?
-    if (current == NULL) return;
-
-    // remove subs
-    for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
-	if (current->subs[i] != NULL) removeTree(current->subs[i]);
-
-    }
-
-    // remove this element
-    free(current);
-}
-
-/* create new node
- */
-t_element* Maze::createNode (Block* i_Block) {
-
-    // get new node
-    t_element* out = (t_element*) malloc(sizeof(t_element));
-    if (out == NULL) {
-	cerr << "Malloc failed!\n";
-	return NULL;
-    }
-
-    // fill
-    out->block = i_Block;
-    out->sum = 0;
-    out->root = NULL;
-
-    for (int i = 0; i < (int) (sizeof(out->subs)/(sizeof(t_element*))); i++) {
-	out->subs[i] = NULL;
-    }
-    out->next = NULL;
-
-    return out;
-}
-
-/* add to list
- */
-void Maze::addToExpandList (t_element* newone) {
-    t_element* current = m_sexpand;
-    int pos = 0;
-
-    // forward to right place
-    while (current != NULL && current->next != NULL && current->next->sum <= newone->sum) {
-	current = current->next;
-	pos++;
-    }
-
-    // add to list
-    if (current == NULL) {
-	// empty list
-	m_sexpand= newone;
-    } else {
-	newone->next = current->next;
-	current->next = newone;
-    }
-}
-
-/* expand node
- */
-bool Maze::expandNode (t_element* current) {
-    int id = current->block->getId();
-    current->block->setExpanded(true);
-    cout << "Expand node " << id << "\n";
-
-    // get ids of neigbours
-    int neighbours[] = {
-	(id - m_columns), // above
-	(id + m_columns), // below
-	(id + 1), // right
-	(id - 1) // left
-    };
-
-    // is right/left in same row?
-    if (neighbours[2]/m_columns != id/m_columns) neighbours[2] = -1;
-    if (neighbours[3]/m_columns != id/m_columns) neighbours[3] = -1;
-
-    // add new elements to list
-    for (int i = 0; i < 4; i++) {
-
-	// get block
-	Block* block = (
-	    isBlock(neighbours[i]) &&
-	    (current->root == NULL || current->root->block->getId() != neighbours[i])
-	) ? m_blocks[neighbours[i]] : NULL;
-	if (block == NULL) continue;
-
-	// is solid block?
-	if (block->isSolid()) continue;
-
-	// create new element
-	t_element* elem = createNode(block);
-	if (elem == NULL) {
-	    cerr << "ERROR: Failed to create node!\n";
-	    return false;
-	}
-
-	// add this element as sub to current
-	for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
-	    if (current->subs[i] == NULL) {
-		current->subs[i] = elem;
-		break;
-	    }
-	}
-
-	// set root and new sum
-	elem->root = current;
-	elem->sum = current->sum + 1;
-
-	// add to list
-	addToExpandList(elem);
-    }
-
-    return true;
-}
-
-/* is block in m_stree
- */
-bool Maze::isBlockExpanded (t_element* current, Block* block) {
-
-    // found?
-    if (current->block == block && current->block->isExpanded()) return true;
-
-    // search sub elements
-    for (int i = 0; i < (int) (sizeof(current->subs)/(sizeof(t_element*))); i++) {
-	if (current->subs[i] != NULL && isBlockExpanded(current->subs[i], block))
-	    return true;
-    }
-
-    return false;
+    m_Search[m_searchtype]->clear();
 }
 
 /* run
  */
 bool Maze::run (int) {
     cout << "Maze::run()\n";
-
-    t_element* ccc = m_sexpand;
-    while (ccc != NULL) {
-	ccc = ccc->next;
+    switch (m_Search[m_searchtype]->run()) {
+	case 1:
+	    m_Contr->on_menu_stop();
+	    setMsg("Goal unreachable!");
+	    break;
+	case 2:
+	    m_Contr->on_menu_pause();
+	    setMsg("Reached goal!");
+	    break;
+	default:
+	    break;
     }
-
-    // get next node to expand
-    t_element* current = m_sexpand;
-    while (current != NULL && current->block->isExpanded()) {
-	current = current->next;
-    }
-
-    // is node?
-    if (current == NULL) {
-	m_Contr->on_menu_stop();
-	setMsg("Goal unreachable!");
-	return false;
-    }
-
-    // update list
-    m_sexpand = current->next;
-    current->next = NULL;
-
-    // reached goal?
-    if (current->block->isGoal()) {
-	m_Contr->on_menu_pause();
-	setMsg("Reached goal!");
-	return false;
-    }
-
-    // expand
-    expandNode(current);
 
     // draw
     queue_draw();
