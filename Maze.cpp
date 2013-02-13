@@ -204,6 +204,17 @@ void Maze::drawTree(const Cairo::RefPtr<Cairo::Context>& cr, t_element* current)
 	cr->stroke();
 	drawTree(cr, current->sub3);
     }
+
+    // draw line to sub4
+    if (current->sub4 != NULL) {
+	double pos_to_x = current->sub4->block->getX(m_block_width) + m_block_width/2;
+	double pos_to_y = current->sub4->block->getY(m_block_height) + m_block_height/2;
+	cr->move_to(0,0);
+	cr->move_to(pos_from_x, pos_from_y);
+	cr->line_to(pos_to_x, pos_to_y);
+	cr->stroke();
+	drawTree(cr, current->sub4);
+    }
 }
 
 /* draw text
@@ -326,6 +337,7 @@ void Maze::removeTree(t_element* current) {
     if (current->sub1 != NULL) removeTree(current->sub1);
     if (current->sub2 != NULL) removeTree(current->sub2);
     if (current->sub3 != NULL) removeTree(current->sub3);
+    if (current->sub4 != NULL) removeTree(current->sub4);
 
     // remove this element
     free(current);
@@ -349,6 +361,7 @@ t_element* Maze::createNode (Block* i_Block) {
     out->sub1 = NULL;
     out->sub2 = NULL;
     out->sub3 = NULL;
+    out->sub4 = NULL;
     out->next = NULL;
 
     return out;
@@ -416,8 +429,10 @@ bool Maze::expandNode (t_element* current) {
 	    current->sub1 = elem;
 	} else if (current->sub2 == NULL) {
 	    current->sub2 = elem;
-	} else {
+	} else if (current->sub3 == NULL) {
 	    current->sub3 = elem;
+	} else {
+	    current->sub4 = elem;
 	}
 
 	// set root and new sum
@@ -444,6 +459,8 @@ bool Maze::isBlockExpanded (t_element* current, Block* block) {
     if (current->sub2 != NULL && isBlockExpanded(current->sub2, block))
 	return true;
     if (current->sub3 != NULL && isBlockExpanded(current->sub3, block))
+	return true;
+    if (current->sub4 != NULL && isBlockExpanded(current->sub4, block))
 	return true;
 
     return false;

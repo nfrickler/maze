@@ -26,6 +26,7 @@ typedef struct s_element {
     struct s_element* sub1;
     struct s_element* sub2;
     struct s_element* sub3;
+    struct s_element* sub4;
     struct s_element* next;
 } t_element;
 
