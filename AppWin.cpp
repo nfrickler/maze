@@ -57,6 +57,7 @@ void AppWin::drawMenu () {
 	Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_quit));
     m_refActionGroup->add(Gtk::Action::create("FileMenu", "File"));
+    m_refActionGroup->add(Gtk::Action::create("SearchMenu", "Search"));
     m_refActionGroup->add(
 	Gtk::Action::create("Run", Gtk::Stock::MEDIA_PLAY, "Run Maze", "Run Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_run));
@@ -81,6 +82,11 @@ void AppWin::drawMenu () {
 	"      <menuitem action='FileSave'/>"
 	"      <menuitem action='FileSaveAs'/>"
 	"      <menuitem action='FileQuit'/>"
+	"    </menu>"
+	"    <menu action='SearchMenu'>"
+	"      <menuitem action='Run'/>"
+	"      <menuitem action='Stop'/>"
+	"      <menuitem action='Pause'/>"
 	"    </menu>"
 	"  </menubar>"
 	"  <toolbar  name='ToolBar'>"
