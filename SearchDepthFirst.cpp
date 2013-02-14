@@ -1,4 +1,4 @@
-#include "SearchBreadthFirst.h"
+#include "SearchDepthFirst.h"
 #include "Maze.h"
 #include "Block.h"
 #include <iostream>
@@ -8,7 +8,7 @@ using namespace std;
 /* constructor
  * @param Maze*: Maze object
  */
-SearchBreadthFirst::SearchBreadthFirst (Maze* i_Maze)
+SearchDepthFirst::SearchDepthFirst (Maze* i_Maze)
     : Search(i_Maze)
 {
     m_stree = NULL;
@@ -19,7 +19,7 @@ SearchBreadthFirst::SearchBreadthFirst (Maze* i_Maze)
  * @param int: number of rows
  * @param int: number of columns
  */
-bool SearchBreadthFirst::init (int i_rows, int i_columns) {
+bool SearchDepthFirst::init (int i_rows, int i_columns) {
     m_stree = NULL;
 
     // get root and goal
@@ -40,7 +40,7 @@ bool SearchBreadthFirst::init (int i_rows, int i_columns) {
 
 /* run next step of search
  */
-int SearchBreadthFirst::run() {
+int SearchDepthFirst::run() {
 
     t_element* ccc = m_sexpand;
     while (ccc != NULL) {
@@ -72,30 +72,19 @@ int SearchBreadthFirst::run() {
 /* add to list
  * @param t_element*: element to be added
  */
-void SearchBreadthFirst::addToExpandList (t_element* newone) {
-    t_element* current = m_sexpand;
-    int pos = 0;
+void SearchDepthFirst::addToExpandList (t_element* newone) {
 
-    // forward to right place
-    while (current != NULL && current->next != NULL && current->next->sum <= newone->sum) {
-	current = current->next;
-	pos++;
+    // add at first position
+    if (m_sexpand != NULL) {
+	newone->next = m_sexpand;
     }
-
-    // add to list
-    if (current == NULL) {
-	// empty list
-	m_sexpand= newone;
-    } else {
-	newone->next = current->next;
-	current->next = newone;
-    }
+    m_sexpand = newone;
 }
 
 /* expand node
  * @param t_element*: node to be expanded
  */
-bool SearchBreadthFirst::expandNode (t_element* current) {
+bool SearchDepthFirst::expandNode (t_element* current) {
     int id = current->block->getId();
     int colnum = m_Maze->getColumnNum();
     current->block->setExpanded(true);

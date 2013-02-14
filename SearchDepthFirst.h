@@ -1,14 +1,14 @@
-#ifndef _SEARCHBREADTHFIRST_H
-#define _SEARCHBREADTHFIRST_H
+#ifndef _SEARCHDEPTHFIRST_H
+#define _SEARCHDEPTHFIRST_H
 
 #include "Search.h"
 
 class Maze;
 
-class SearchBreadthFirst : public Search {
+class SearchDepthFirst : public Search {
 
     public:
-	SearchBreadthFirst(Maze* i_Maze);
+	SearchDepthFirst(Maze* i_Maze);
 
 	bool init(int i_rows, int i_columns);
 	int run();
@@ -16,4 +16,4 @@ class SearchBreadthFirst : public Search {
 	bool expandNode(t_element*);
 };
 
-#endif // _SEARCHBREADTHFIRST_H
+#endif // _SEARCHDEPTHFIRST_H
