@@ -88,6 +88,11 @@ void AppWin::drawMenu () {
 	m_refChoice1,
 	sigc::mem_fun(*this, &AppWin::handleChoices)
     );
+    m_refChoice2 = Gtk::RadioAction::create(group_type, "Type2", "A*-Search");
+    m_refActionGroup->add(
+	m_refChoice2,
+	sigc::mem_fun(*this, &AppWin::handleChoices)
+    );
 
     m_refUIManager = Gtk::UIManager::create();
     m_refUIManager->insert_action_group(m_refActionGroup);
@@ -112,6 +117,7 @@ void AppWin::drawMenu () {
 	"    <menu action='ChoicesMenu'>"
 	"      <menuitem action='Type0'/>"
 	"      <menuitem action='Type1'/>"
+	"      <menuitem action='Type2'/>"
 	"    </menu>"
 	"  </menubar>"
 	"  <toolbar  name='ToolBar'>"
@@ -167,6 +173,8 @@ void AppWin::handleChoices () {
 	m_Contr->on_menu_type0();
     } else if (m_refChoice1->get_active()) {
 	m_Contr->on_menu_type1();
+    } else if (m_refChoice2->get_active()) {
+	m_Contr->on_menu_type2();
     }
 }
 

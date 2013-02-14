@@ -29,7 +29,7 @@ class AppWin : public Gtk::Window {
 
 	Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
-	Glib::RefPtr<Gtk::RadioAction> m_refChoice0, m_refChoice1;
+	Glib::RefPtr<Gtk::RadioAction> m_refChoice0, m_refChoice1, m_refChoice2;
 
 	void drawMenu();
 };

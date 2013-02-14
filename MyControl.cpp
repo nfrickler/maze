@@ -158,6 +158,14 @@ void MyControl::on_menu_type1() {
     m_Maze->setSearchtype(1);
 }
 
+/* change to search type 2
+ */
+void MyControl::on_menu_type2() {
+    cout << "MyControl:on_menu_type2()\n";
+    initSearch();
+    m_Maze->setSearchtype(2);
+}
+
 /* ################### timer handling ################## */
 
 /* start/stop timer

@@ -35,6 +35,7 @@ class MyControl {
 
 	void on_menu_type0();
 	void on_menu_type1();
+	void on_menu_type2();
 
     protected:
 	Maze* m_Maze;

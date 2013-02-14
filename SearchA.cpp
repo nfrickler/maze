@@ -1,4 +1,4 @@
-#include "SearchBreadthFirst.h"
+#include "SearchA.h"
 #include "Maze.h"
 #include "Block.h"
 #include <iostream>
@@ -8,7 +8,7 @@ using namespace std;
 /* constructor
  * @param Maze*: Maze object
  */
-SearchBreadthFirst::SearchBreadthFirst (Maze* i_Maze)
+SearchA::SearchA (Maze* i_Maze)
     : Search(i_Maze)
 {
     m_stree = NULL;
@@ -19,7 +19,7 @@ SearchBreadthFirst::SearchBreadthFirst (Maze* i_Maze)
  * @param int: number of rows
  * @param int: number of columns
  */
-bool SearchBreadthFirst::init (int i_rows, int i_columns) {
+bool SearchA::init (int i_rows, int i_columns) {
     m_stree = NULL;
 
     // get root and goal
@@ -29,6 +29,9 @@ bool SearchBreadthFirst::init (int i_rows, int i_columns) {
 	if (block->isRoot()) {
 	    if (m_stree != NULL) return false;
 	    m_stree = createNode(block);
+	}
+	if (block->isGoal()) {
+	    m_goal = block;
 	}
     }
 
@@ -40,7 +43,7 @@ bool SearchBreadthFirst::init (int i_rows, int i_columns) {
 
 /* run next step of search
  */
-int SearchBreadthFirst::run() {
+int SearchA::run() {
 
     t_element* ccc = m_sexpand;
     while (ccc != NULL) {
@@ -72,12 +75,12 @@ int SearchBreadthFirst::run() {
 /* add to list
  * @param t_element*: element to be added
  */
-void SearchBreadthFirst::addToExpandList (t_element* newone) {
+void SearchA::addToExpandList (t_element* newone) {
     t_element* before = NULL;
     t_element* current = m_sexpand;
 
     // forward to right place
-    while (current != NULL && current->sum <= newone->sum) {
+    while (current != NULL && current->sum2 <= newone->sum2) {
 	before = current;
 	current = current->next;
     }
@@ -95,7 +98,7 @@ void SearchBreadthFirst::addToExpandList (t_element* newone) {
 /* expand node
  * @param t_element*: node to be expanded
  */
-bool SearchBreadthFirst::expandNode (t_element* current) {
+bool SearchA::expandNode (t_element* current) {
     int id = current->block->getId();
     int colnum = m_Maze->getColumnNum();
     current->block->setExpanded(true);
@@ -144,10 +147,20 @@ bool SearchBreadthFirst::expandNode (t_element* current) {
 	// set root and new sum
 	elem->root = current;
 	elem->sum = current->sum + 1;
+	elem->sum2 = elem->sum + getDistance(elem);
 
 	// add to list
 	addToExpandList(elem);
     }
 
     return true;
+}
+
+/* get distance to goal
+ * @param t_element*: element to measure from
+ */
+double SearchA::getDistance(t_element* i_from) {
+    double diff_x = abs(i_from->block->getColumn() - m_goal->getColumn());
+    double diff_y = abs(i_from->block->getRow() - m_goal->getRow());
+    return sqrt(diff_x*diff_x + diff_y*diff_y);
 }

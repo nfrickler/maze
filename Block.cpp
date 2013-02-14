@@ -69,3 +69,5 @@ double Block::getY(int i_height) {
 }
 void Block::setExpanded(bool i_exp) { m_isexpanded = i_exp; }
 bool Block::isExpanded() { return m_isexpanded; }
+int Block::getRow() { return m_row; }
+int Block::getColumn() { return m_column; }

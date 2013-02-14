@@ -53,6 +53,7 @@ t_element* Search::createNode (Block* i_Block) {
     // fill
     out->block = i_Block;
     out->sum = 0;
+    out->sum2 = 0;
     out->root = NULL;
 
     for (int i = 0; i < (int) (sizeof(out->subs)/(sizeof(t_element*))); i++) {

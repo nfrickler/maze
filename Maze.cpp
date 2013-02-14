@@ -10,6 +10,7 @@
 #include "Search.h"
 #include "SearchBreadthFirst.h"
 #include "SearchDepthFirst.h"
+#include "SearchA.h"
 
 const Gdk::Color BLOCK_COLORS[BLOCK_NAMES_SIZE] = {
     Gdk::Color("white"),
@@ -39,6 +40,7 @@ Maze::Maze (MyControl* i_Contr)
     m_searchtype = 0;
     m_Search[0] = new SearchBreadthFirst(this);
     m_Search[1] = new SearchDepthFirst(this);
+    m_Search[2] = new SearchA(this);
 
     // catch mouseclicks on maze
     this->add_events(Gdk::BUTTON_PRESS_MASK);

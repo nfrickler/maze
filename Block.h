@@ -19,6 +19,8 @@ class Block {
 	bool isSolid();
 	double getX(int i_width);
 	double getY(int i_height);
+	int getRow();
+	int getColumn();
 
     protected:
 	int m_id;

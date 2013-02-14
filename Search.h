@@ -9,6 +9,7 @@ class Block;
 typedef struct s_element {
     Block* block;
     int sum;
+    double sum2;
     struct s_element* root;
     struct s_element* subs[4];
     struct s_element* next;
