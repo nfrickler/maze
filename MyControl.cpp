@@ -14,13 +14,13 @@ MyControl::MyControl () {
 
     // create new Maze object
     m_Maze = new Maze(this);
-    on_menu_new();
 
     // create new AppWin object
     m_AppWin = new AppWin(this);
 
     // show Window
     m_AppWin->showPainter(m_Maze);
+    on_menu_new();
 }
 
 /* getter */
@@ -34,7 +34,12 @@ void MyControl::on_menu_new() {
     m_Maze->setMsg("Create/Load new maze");
     stopTimer();
     m_path = "";
-    m_Maze->createMaze(12, 12);
+
+    int rownum = m_AppWin->getRowNum();
+    int colnum = m_AppWin->getColNum();
+    if (rownum > 100 || rownum < 0) rownum = 12;
+    if (colnum > 100 || colnum < 0) colnum = 12;
+    m_Maze->createMaze(rownum, colnum);
     m_Maze->setPaintable(true);
 }
 

@@ -26,7 +26,7 @@ class Maze : public Gtk::DrawingArea {
 	Maze(MyControl* i_Contr);
 
 	// create/delete maze
-	void createMaze(int i_columns, int i_rows);
+	void createMaze(int i_rows, int i_columns);
 	void deleteMaze();
 
 	// search

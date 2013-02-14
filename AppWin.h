@@ -14,6 +14,9 @@ class AppWin : public Gtk::Window {
 	void showPainter(Maze* i_Maze);
 	std::string getPath(Gtk::FileChooserAction type, const Gtk::BuiltinStockID button);
 
+	int getRowNum();
+	int getColNum();
+
     protected:
 	MyControl* m_Contr;
 
@@ -21,6 +24,7 @@ class AppWin : public Gtk::Window {
 	Gtk::VBox* m_vbox;
 
 	Gtk::Dialog* m_dialog;
+	Gtk::Entry *m_colnum, *m_rownum;
 
 	Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;

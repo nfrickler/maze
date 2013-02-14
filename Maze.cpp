@@ -206,7 +206,7 @@ bool Maze::on_event_happend(GdkEvent *event) {
 	int column = (int) (pos_x / m_block_width);
 
 	// get id of block
-	int i = (row) * m_rows + column;
+	int i = (row) * m_columns + column;
 
 	// is block?
 	if (!isBlock(i)) return false;

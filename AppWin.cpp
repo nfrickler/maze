@@ -3,6 +3,7 @@
 #include "Maze.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -14,7 +15,11 @@ AppWin::AppWin (MyControl* i_Contr)
     // set up window
     set_border_width(0);
     set_title("Maze");
-    set_size_request(800,600);
+    set_default_size(800,600);
+
+    // init
+    m_rownum = NULL;
+    m_colnum = NULL;
 
     // add toplevel box on window
     m_vbox = new Gtk::VBox();
@@ -94,9 +99,11 @@ void AppWin::drawMenu () {
 	"    <toolitem action='FileLoad'/>"
 	"    <toolitem action='FileSave'/>"
 	"    <toolitem action='FileSaveAs'/>"
+	"    <separator/>"
 	"    <toolitem action='Run'/>"
 	"    <toolitem action='Pause'/>"
 	"    <toolitem action='Stop'/>"
+	"    <separator/>"
 	"    <toolitem action='FileQuit'/>"
 	"  </toolbar>"
 	"</ui>";
@@ -110,8 +117,48 @@ void AppWin::drawMenu () {
     // add menubar and toolbar to vbox
     Gtk::Widget* pMenubar = m_refUIManager->get_widget("/MenuBar");
     if(pMenubar) m_vbox->pack_start(*pMenubar, Gtk::PACK_SHRINK);
+    Gtk::HBox* menuhbox = new Gtk::HBox();
+    m_vbox->pack_start(*menuhbox, Gtk::PACK_SHRINK);
     Gtk::Widget* pToolbar = m_refUIManager->get_widget("/ToolBar") ;
-    if(pToolbar) m_vbox->pack_start(*pToolbar, Gtk::PACK_SHRINK);
+    if(pToolbar) menuhbox->pack_start(*pToolbar, Gtk::PACK_EXPAND_WIDGET);
+
+    // create input fields
+    Gtk::Label* sizelabel = new Gtk::Label("Size of maze:");
+    menuhbox->pack_start(*sizelabel, Gtk::PACK_SHRINK);
+    m_rownum = new Gtk::Entry();
+    m_rownum->set_text("12");
+    m_rownum->set_width_chars(3);
+    m_rownum->set_max_length(3);
+    menuhbox->pack_start(*m_rownum, Gtk::PACK_SHRINK);
+    Gtk::Label* sizelabel2 = new Gtk::Label("x");
+    menuhbox->pack_start(*sizelabel2, Gtk::PACK_SHRINK);
+    m_colnum = new Gtk::Entry();
+    m_colnum->set_text("12");
+    m_colnum->set_width_chars(3);
+    m_colnum->set_max_length(3);
+    menuhbox->pack_start(*m_colnum, Gtk::PACK_SHRINK);
+}
+
+/* get rownum entered
+ */
+int AppWin::getRowNum() {
+    int out;
+    stringstream ss;
+    Glib::ustring cache = m_rownum->get_text();
+    ss << cache.raw();
+    ss >> out;
+    return out;
+}
+
+/* get colnum entered
+ */
+int AppWin::getColNum() {
+    int out;
+    stringstream ss;
+    Glib::ustring cache = m_colnum->get_text();
+    ss << cache.raw();
+    ss >> out;
+    return out;
 }
 
 /* ask user for path
