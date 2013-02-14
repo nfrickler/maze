@@ -27,6 +27,8 @@ MyControl::MyControl () {
 AppWin* MyControl::getAppWin () { return m_AppWin; }
 Maze* MyControl::getMaze () { return m_Maze; }
 
+/* ################### new/quit/load/save ################## */
+
 /* create new emtpy maze
  */
 void MyControl::on_menu_new() {
@@ -100,6 +102,8 @@ void MyControl::on_menu_file_load() {
     m_Maze->setPaintable(true);
 }
 
+/* ################### run/pause/stop ################## */
+
 /* run search
  */
 void MyControl::on_menu_run() {
@@ -136,6 +140,26 @@ void MyControl::on_menu_pause() {
     }
 }
 
+/* ################### change search type ################## */
+
+/* change to search type 0
+ */
+void MyControl::on_menu_type0() {
+    cout << "MyControl:on_menu_type0()\n";
+    initSearch();
+    m_Maze->setSearchtype(0);
+}
+
+/* change to search type 1
+ */
+void MyControl::on_menu_type1() {
+    cout << "MyControl:on_menu_type1()\n";
+    initSearch();
+    m_Maze->setSearchtype(1);
+}
+
+/* ################### timer handling ################## */
+
 /* start/stop timer
  */
 void MyControl::startTimer() {
@@ -150,6 +174,8 @@ void MyControl::stopTimer() {
     m_timer.disconnect();
 }
 
+/* ################### search handling ################## */
+
 /* init/clear search
  */
 bool MyControl::initSearch () {
@@ -163,6 +189,8 @@ bool MyControl::initSearch () {
 void MyControl::clearSearch () {
     m_Maze->clearSearch();
 }
+
+/* ################### misc ################## */
 
 /* add extension to file if missing
  */

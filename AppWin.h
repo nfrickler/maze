@@ -16,6 +16,7 @@ class AppWin : public Gtk::Window {
 
 	int getRowNum();
 	int getColNum();
+	void handleChoices();
 
     protected:
 	MyControl* m_Contr;
@@ -28,6 +29,7 @@ class AppWin : public Gtk::Window {
 
 	Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+	Glib::RefPtr<Gtk::RadioAction> m_refChoice0, m_refChoice1;
 
 	void drawMenu();
 };

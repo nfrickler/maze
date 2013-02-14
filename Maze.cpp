@@ -36,7 +36,8 @@ Maze::Maze (MyControl* i_Contr)
 
     // init Search objects
     m_searchtype = 0;
-    m_Search[m_searchtype] = new SearchBreadthFirst(this);
+    m_Search[0] = new SearchBreadthFirst(this);
+    m_Search[1] = new SearchBreadthFirst(this);
 
     // catch mouseclicks on maze
     this->add_events(Gdk::BUTTON_PRESS_MASK);
@@ -110,6 +111,7 @@ void Maze::setMsg(const char* i_msg) {
     m_msg = i_msg;
     queue_draw();
 }
+void Maze::setSearchtype(int i_type) { m_searchtype = i_type; }
 
 /* ############################## draw ###################################### */
 
@@ -252,6 +254,7 @@ bool Maze::initSearch() {
  */
 void Maze::clearSearch() {
     m_Search[m_searchtype]->clear();
+    queue_draw();
 }
 
 /* run

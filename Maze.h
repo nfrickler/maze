@@ -36,6 +36,7 @@ class Maze : public Gtk::DrawingArea {
 	Search* m_Search[3];
 	int m_searchtype;
 	bool run(int);
+	void setSearchtype(int);
 
 	// gereral
 	bool isPaintable();

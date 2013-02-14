@@ -62,6 +62,8 @@ void AppWin::drawMenu () {
 	Gtk::Action::create("FileQuit", Gtk::Stock::QUIT),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_quit));
     m_refActionGroup->add(Gtk::Action::create("FileMenu", "File"));
+
+    // search menu
     m_refActionGroup->add(Gtk::Action::create("SearchMenu", "Search"));
     m_refActionGroup->add(
 	Gtk::Action::create("Run", Gtk::Stock::MEDIA_PLAY, "Run Maze", "Run Maze"),
@@ -72,6 +74,20 @@ void AppWin::drawMenu () {
     m_refActionGroup->add(
 	Gtk::Action::create("Stop", Gtk::Stock::MEDIA_STOP, "Stop Maze", "Stop Maze"),
 	sigc::mem_fun(*m_Contr, &MyControl::on_menu_stop));
+
+    // selection of search type
+    m_refActionGroup->add(Gtk::Action::create("ChoicesMenu", "Search type"));
+    Gtk::RadioAction::Group group_type;
+    m_refChoice0 = Gtk::RadioAction::create(group_type, "Type0", "Breadth-First-Search");
+    m_refActionGroup->add(
+	m_refChoice0,
+	sigc::mem_fun(*this, &AppWin::handleChoices)
+    );
+    m_refChoice1 = Gtk::RadioAction::create(group_type, "Type1", "Depth-First-Search");
+    m_refActionGroup->add(
+	m_refChoice1,
+	sigc::mem_fun(*this, &AppWin::handleChoices)
+    );
 
     m_refUIManager = Gtk::UIManager::create();
     m_refUIManager->insert_action_group(m_refActionGroup);
@@ -92,6 +108,10 @@ void AppWin::drawMenu () {
 	"      <menuitem action='Run'/>"
 	"      <menuitem action='Stop'/>"
 	"      <menuitem action='Pause'/>"
+	"    </menu>"
+	"    <menu action='ChoicesMenu'>"
+	"      <menuitem action='Type0'/>"
+	"      <menuitem action='Type1'/>"
 	"    </menu>"
 	"  </menubar>"
 	"  <toolbar  name='ToolBar'>"
@@ -137,6 +157,17 @@ void AppWin::drawMenu () {
     m_colnum->set_width_chars(3);
     m_colnum->set_max_length(3);
     menuhbox->pack_start(*m_colnum, Gtk::PACK_SHRINK);
+}
+
+/* handle choices
+ */
+void AppWin::handleChoices () {
+
+    if (m_refChoice0->get_active()) {
+	m_Contr->on_menu_type0();
+    } else if (m_refChoice1->get_active()) {
+	m_Contr->on_menu_type1();
+    }
 }
 
 /* get rownum entered

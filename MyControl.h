@@ -33,6 +33,9 @@ class MyControl {
 	void on_menu_stop();
 	void on_menu_pause();
 
+	void on_menu_type0();
+	void on_menu_type1();
+
     protected:
 	Maze* m_Maze;
 	AppWin* m_AppWin;
